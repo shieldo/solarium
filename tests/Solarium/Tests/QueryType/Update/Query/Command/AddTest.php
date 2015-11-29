@@ -64,6 +64,8 @@ class AddTest extends \PHPUnit_Framework_TestCase
 
     public function testAddDocumentWithInvalidDocument()
     {
+        $expectedExceptionMessage = 'Argument 1 passed to '.get_class($this->command).'::addDocument() must implement interface '.
+            'Solarium\QueryType\Update\Query\Document\DocumentInterface';
         try {
             $doc = new \StdClass();
             $this->command->addDocument($doc);
@@ -73,10 +75,18 @@ class AddTest extends \PHPUnit_Framework_TestCase
             );
         } catch (\PHPUnit_Framework_Error $e) {
             $this->assertContains(
-                'Argument 1 passed to '.get_class($this->command).'::addDocument() must implement interface '.
-                'Solarium\QueryType\Update\Query\Document\DocumentInterface',
+                $expectedExceptionMessage,
                 $e->getMessage()
             );
+        } catch (\TypeError $e) {
+            $this->assertContains(
+                $expectedExceptionMessage,
+                $e->getMessage()
+            );
+        } catch (\Exception $e) {
+            $this->fail('Either a specific PHPUnit error or a PHP 7 TypeError were expected.');
+        } catch (\Throwable $e) {
+            $this->fail('Either a specific PHPUnit error or a PHP 7 TypeError were expected.');
         }
     }
 
